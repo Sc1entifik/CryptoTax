@@ -1,0 +1,10 @@
+Forms you need to use for taxes:
+
+1) Form 8949 & Scedule D- Use these forms to report the sale of crypto assets, futures, income, crypto options income, & crypto swaps
+2) Schedule 1 - Use to report income from airdrops, forks, "crypto wages" and hobby income
+3) Schedule A - Use to report crypto donations
+4) Schedule B - Use to report Defi income, crypto interest income, and staking income.
+5) Schedule C - Use to report crypto mining income and business income earned in crypto.
+6) Schedule E - used as another option to report staking income
+7) Form 8275 Used to report additional disclosures (optional).
+
