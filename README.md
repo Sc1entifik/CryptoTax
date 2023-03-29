@@ -34,3 +34,13 @@ This is just an overview discription and each item listed here will be further d
 
 ## Version features
 - v.01: Initial Commit. Barely getting started not functioning. Do not use yet. Includes .gitignore due to wanting to keep any tax information which may accidently get pushed to this repository private.
+
+- v.0.4: 
+	1. Renamed taxtool.py to quarterly.py in order to create more .py files for seperation of concerns. 
+	2. Created create_directories.sh to create needed directories for program to run properly while being able to push to repository without pushing sensitive files.
+	3. quarterly.py will now create quarterly income and writeoff files and can use them to fill out a quarterly payment slip. 
+
+## Upcoming features
+- Download transactions csv files from blockchain explorers.
+- Labeling transactions in blockchain transaction csv files.
+- More automated tax forms coming!

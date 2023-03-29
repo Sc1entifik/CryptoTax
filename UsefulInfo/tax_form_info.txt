@@ -1,4 +1,4 @@
-Forms you need to use for taxes:
+Forms you need to use for taxes (US):
 
 1) Form 8949 & Scedule D- Use these forms to report the sale of crypto assets, futures, income, crypto options income, & crypto swaps
 2) Schedule 1 - Use to report income from airdrops, forks, "crypto wages" and hobby income
