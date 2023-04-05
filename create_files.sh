@@ -1,0 +1,35 @@
+#!/bin/bash
+echo "This shell script creates the following files needed in the folders created by create_directories.sh"
+echo ""
+echo "CryptoTax/CSV/OtherInformation/tax_jurisdiction_percentages.csv"
+echo "CryptoTax/CSV/OtherInformation/blockchain_explorers.csv"
+echo ""
+echo "After running this script please go to the above filepaths and fill out all the information the .csv files request. Refer to instructions.txt for detailed information"
+echo ""
+echo "key,value" > "CSV/OtherInformation/blockchain_explorers.csv"
+cat << EOF > CSV/OtherInformation/tax_jurisdiction_percentages.csv
+federal,state,local
+.12,.0307,.017
+EOF
+echo""
+cat << EOF > CSV/OtherInformation/bridge_addresses.csv
+key,value
+dfk_synapse,0x75224b0f245Fe51d5bf47A898DbB6720D4150BA7
+dfk_hero_synapse,0x739B1666c2956f601f095298132773074c3E184b
+dfk_item_synapse,0x501CdC4ef10b63219704Bf6aDb785dfccb06deE2
+arb_synapse,0x37f9aE2e0Ea6742b9CAD5AbCfB6bBC3475b3862B
+avax_synapse,0x0EF812f4c68DC84c22A4821EF30ba2ffAB9C2f3A
+ftm_synapse,0xB003e75f7E0B5365e814302192E99b4EE08c0DEd
+optimism_synapse,0x470f9522ff620eE45DF86C58E54E6A645fE3b4A7
+moonbeam_synapse,0x73783F028c60D463bc604cc53852C37C31dEC5e9
+moonriver_synapse,0x06Fea8513FF03a0d3f61324da709D4cf06F42A5c
+matic,0x1c6aE197fF4BF7BA96c66C5FD64Cb22450aF9cC8
+klay_usdc_synapse,0x6270b58be569a7c0b8f47594f191631ae5b2c86c
+klay_usdt_synapse,0xd6dAb4CfF47dF175349e6e7eE2BF7c40Bb8C05A3
+klay_dai_synapse,0x078dB7827a5531359f6CB63f62CFA20183c4F10c
+klay_wbtc_synapse,0xDCbacF3f7a069922E677912998c8d57423C37dfA
+klay_weth_synapse,0xCD6f29dC9Ca217d0973d3D21bF58eDd3CA871a86
+ftm_usdc_multichain,0x04068DA6C83AFCFA0e13ba15A6696662335D5B75
+arb_usdc_multichain,0xC931f61B1534EB21D8c11B24f3f5Ab2471d4aB50
+EOF
+

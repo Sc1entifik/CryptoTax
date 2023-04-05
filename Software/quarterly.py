@@ -85,8 +85,6 @@ class QuarterlyTaxes():
         return f'{quarterly_form_filepath} has been created!'
         
 
-this_year = QuarterlyTaxes(2023)
-print(this_year.fill_out_quarterly_form(1))
     
 
         

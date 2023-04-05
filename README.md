@@ -21,7 +21,7 @@ As of now there is no support for any forms other than US tax forms.
 
 This is just an overview discription and each item listed here will be further discussed in the instructions section.
 
-- Enter your wallet addresses into the your_wallet_addresses.csv file for each relevant L1 Blockchain in the YourWallets folder in the CSV folder. Each L1 Blockchain will have one of these.
+- Enter your wallet addresses into the pub_wallet_addresses.csv file for each relevant L1 Blockchain in the PubWallets folder in the CSV folder. Each L1 Blockchain will have one of these.
 - Use the UX to dl all transaction forms for your tax period to the Blockchain transaction folder for the Blockchains that you interact with.
 - Fill out the other CSV data forms in the CSV OtherForms folder this will cover things like bridging addresses. There will only be one of these for each type of address as no two blockchains should ever have an identical bridging address for example.
 - Use the UX to label all transactions. This option will access your wallet addresses and other addresses listed in OtherForms such as Bridge addresses to label all the transactions in the files in your Blockchain transaction folders.
@@ -35,12 +35,22 @@ This is just an overview discription and each item listed here will be further d
 ## Version features
 - v.01: Initial Commit. Barely getting started not functioning. Do not use yet. Includes .gitignore due to wanting to keep any tax information which may accidently get pushed to this repository private.
 
-- v.0.4: 
+- v.0.04: 
 	1. Renamed taxtool.py to quarterly.py in order to create more .py files for seperation of concerns. 
 	2. Created create_directories.sh to create needed directories for program to run properly while being able to push to repository without pushing sensitive files.
 	3. quarterly.py will now create quarterly income and writeoff files and can use them to fill out a quarterly payment slip. 
 
+- v.0.25: 
+	1. Created blockchain.py with methods for helping you to download transaction .csv files and create 8949c tax forms with data from those forms
+	2. Support for DefiKingdoms chain added! Transaction CSV file can be downloaded from Lila's Ledger
+	3. create_directories.sh bash file added for creation of directories which are needed but not tracked by git.
+	4. create_files.sh bash file added for creation of needed files software needs to run right but are not tracked by git.
+	5. instructions.md added with instructions on how to use software!
+
 ## Upcoming features
 - Download transactions csv files from blockchain explorers.
 - Labeling transactions in blockchain transaction csv files.
+- Proper text based UX which runs in the command line!
 - More automated tax forms coming!
+- More blockchains to be supported!
+- Tax record archive process!
