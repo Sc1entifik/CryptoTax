@@ -47,6 +47,12 @@ This is just an overview discription and each item listed here will be further d
 	4. create_files.sh bash file added for creation of needed files software needs to run right but are not tracked by git.
 	5. instructions.md added with instructions on how to use software!
 
+- v.0.29:
+	1. Added Thorchain support. Thorchain class will download transaction reports for Thorswap transactions.
+	2. Thorchain class will also modify transaction report making headers more clean and adding discovery prices in USD powered by the coin gecko api!
+	3. api_data.py file added with CoinGecko class which can pull the USD historical discovery price for most cryptos for blockchain explorers which fail to provide this information.
+	4. Cleaned up code by making common_functions.py which ports useful functions that are used accross multiple py files in this project that don't quite belong inside a particular class.
+
 ## Upcoming features
 - Download transactions csv files from blockchain explorers.
 - Labeling transactions in blockchain transaction csv files.
