@@ -33,25 +33,39 @@ This is just an overview discription and each item listed here will be further d
 
 
 ## Version features
-- v.01: Initial Commit. Barely getting started not functioning. Do not use yet. Includes .gitignore due to wanting to keep any tax information which may accidently get pushed to this repository private.
+1. v.01: 
 
-- v.0.04: 
-	1. Renamed taxtool.py to quarterly.py in order to create more .py files for seperation of concerns. 
-	2. Created create_directories.sh to create needed directories for program to run properly while being able to push to repository without pushing sensitive files.
-	3. quarterly.py will now create quarterly income and writeoff files and can use them to fill out a quarterly payment slip. 
+	- Initial Commit. Barely getting started not functioning. Do not use yet. Includes .gitignore due to wanting to keep any tax information which may accidently get pushed to this repository private.
 
-- v.0.25: 
-	1. Created blockchain.py with methods for helping you to download transaction .csv files and create 8949c tax forms with data from those forms
-	2. Support for DefiKingdoms chain added! Transaction CSV file can be downloaded from Lila's Ledger
-	3. create_directories.sh bash file added for creation of directories which are needed but not tracked by git.
-	4. create_files.sh bash file added for creation of needed files software needs to run right but are not tracked by git.
-	5. instructions.md added with instructions on how to use software!
+2. v.0.04: 
 
-- v.0.29:
-	1. Added Thorchain support. Thorchain class will download transaction reports for Thorswap transactions.
-	2. Thorchain class will also modify transaction report making headers more clean and adding discovery prices in USD powered by the coin gecko api!
-	3. api_data.py file added with CoinGecko class which can pull the USD historical discovery price for most cryptos for blockchain explorers which fail to provide this information.
-	4. Cleaned up code by making common_functions.py which ports useful functions that are used accross multiple py files in this project that don't quite belong inside a particular class.
+	- Renamed taxtool.py to quarterly.py in order to create more .py files for seperation of concerns. 
+	- Created create_directories.sh to create needed directories for program to run properly while being able to push to repository without pushing sensitive files.
+	- quarterly.py will now create quarterly income and writeoff files and can use them to fill out a quarterly payment slip. 
+
+3. v.0.25: 
+
+	- Created blockchain.py with methods for helping you to download transaction .csv files and create 8949c tax forms with data from those forms
+	- Support for DefiKingdoms chain added! Transaction CSV file can be downloaded from Lila's Ledger
+	- create_directories.sh bash file added for creation of directories which are needed but not tracked by git.
+	- create_files.sh bash file added for creation of needed files software needs to run right but are not tracked by git.
+	- instructions.md added with instructions on how to use software!
+
+4. v.0.29:
+
+	- Added Thorchain class to blockchain.py.
+	- Thorchain class will download transaction reports for Thorswap transactions.
+	- Thorchain class will modify transaction reports making headers more clean and adding discovery prices in USD powered by the coin gecko api!
+	- api_data.py file added with CoinGecko class which can pull the USD historical discovery price for most cryptos for blockchain explorers which fail to provide this information.
+	- Cleaned up code by making common_functions.py which ports useful functions that are used accross multiple py files in this project that don't quite belong inside a particular class.
+
+5. v.0.33
+
+	- Added Arbitrum class to blockchain.py
+	- Arbitrum class will download transaction reports for Arbitrum transactions.
+	- Arbitrum class will read Arbiscan transaction reports, find mining deposits, and create a mining income csv file.
+
+	
 
 ## Upcoming features
 - Download transactions csv files from blockchain explorers.

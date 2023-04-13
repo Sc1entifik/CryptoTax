@@ -15,6 +15,7 @@ class Blockchain():
     blockchain_transactions_filepath = '../CSV/BlockchainTxReports/'
     explorer_dictionary = dictionary_from_csv(f'{other_information_filepath}/blockchain_explorers.csv')
     mining_address_dictionary = dictionary_from_csv(f'{other_information_filepath}/mining_pool_addresses.csv')
+    mining_income_filepath = '../CSV/MiningIncome/'
     
     def __init__(self):
         pass
@@ -207,9 +208,56 @@ class ThorChain(Blockchain):
         return f'{self.thor_transactions_filepath} has been modified!' 
 
 
+class Arbitrum(Blockchain):
+
+    def __init__(self):
+        super().__init__()
+        self.wallet_address_dictionary = dictionary_from_csv(f'{Arbitrum.pub_wallets_filepath}ETH/pub_wallets.csv')
+        self.arb_transactions_filepath = f'{Arbitrum.blockchain_transactions_filepath}ARB/'
+        self.mining_income_filepath = f'{Arbitrum.mining_income_filepath}ARB/'
+
+
+    def download_arb_transactions(self):
         
+        for wallet in self.wallet_address_dictionary.values():
+            download_url = f'{Arbitrum.explorer_dictionary.get("arb")}{wallet}'
+            self.dl_tx_report_link(download_url, self.arb_transactions_filepath)
+            print(f'Your default webbrowser has been loaded to {download_url}. Complete the robot tests there and then save your transactions file to {self.arb_transactions_filepath}arb{wallet}.csv.\n\n')
+        
+        return 'Make sure to follow the above directions for all your Arbitrum chain wallet addresses.' 
 
 
-thor = ThorChain()
-#print(download_thor_transactions())
-#print(thor.create_8949_from_transactions_csv())
+    def create_mining_income_reports(self):
+        filepath_list = [item for item in pathlib.Path(self.arb_transactions_filepath).iterdir() if item.is_file()]
+        
+        for file in filepath_list:
+            with open(file, 'r') as transactions_csv:
+                mining_deposit_object = csv.reader(transactions_csv)
+                header_list = next(mining_deposit_object)
+                header_index = {header: header_list.index(header) for header in header_list}
+                mining_header_list = ['mining_pool_address', 'datetime', 'historcal_price', 'eth_deposited', 'value_deposited', 'transaction_fee', 'cost_basis']
+                mining_income = []
+
+                for row in mining_deposit_object:
+                    if row[header_index.get('From')] in self.mining_address_dictionary.values():
+                        mining_pool_address = row[header_index.get('From')]
+                        date = row[header_index.get('DateTime')]
+                        historical_price = row[header_index.get('Historical $Price/ETH')]
+                        eth_deposited = row[header_index.get('Value_IN(ETH)')]
+                        value_deposited = float(historical_price) * float(eth_deposited)
+                        transaction_fee = row[header_index.get('TxnFee(USD)')]
+                        cost_basis = value_deposited - float(transaction_fee)
+                        mining_income_list = [mining_pool_address, date, historical_price, eth_deposited, value_deposited, transaction_fee, cost_basis]
+                        mining_income.append(mining_income_list)
+
+                with open(f'{self.mining_income_filepath}{file.stem}.csv', 'w') as mining_income_csv:
+                    mining_pool_object = csv.writer(mining_income_csv)
+                    mining_pool_object.writerow(mining_header_list)
+                    mining_pool_object.writerows(mining_income)
+                
+        return f'Mining income reports created in {Arbitrum.mining_income_filepath}!'
+
+
+arb = Arbitrum()
+#print(arb.download_arb_transactions())
+print(arb.create_mining_income_reports())
