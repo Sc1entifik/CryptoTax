@@ -13,9 +13,11 @@ class Blockchain():
     other_information_filepath = '../CSV/OtherInformation/'
     pub_wallets_filepath = '../CSV/PubWallets/'
     blockchain_transactions_filepath = '../CSV/BlockchainTxReports/'
+    mining_income_filepath = '../CSV/MiningIncome/'
+    cost_basis_filepath = '../CSV/CostBasis/'
     explorer_dictionary = dictionary_from_csv(f'{other_information_filepath}/blockchain_explorers.csv')
     mining_address_dictionary = dictionary_from_csv(f'{other_information_filepath}/mining_pool_addresses.csv')
-    mining_income_filepath = '../CSV/MiningIncome/'
+    tx_hash_explorers = dictionary_from_csv(f'{other_information_filepath}tx_hash_explorers.csv')
     
     def __init__(self):
         pass
@@ -212,9 +214,11 @@ class Arbitrum(Blockchain):
 
     def __init__(self):
         super().__init__()
-        self.wallet_address_dictionary = dictionary_from_csv(f'{Arbitrum.pub_wallets_filepath}ETH/pub_wallets.csv')
         self.arb_transactions_filepath = f'{Arbitrum.blockchain_transactions_filepath}ARB/'
         self.mining_income_filepath = f'{Arbitrum.mining_income_filepath}ARB/'
+        self.cost_basis_filepath = f'{Arbitrum.cost_basis_filepath}ETH/ARB/cost_basis.csv'
+        self.wallet_address_dictionary = dictionary_from_csv(f'{Arbitrum.pub_wallets_filepath}ETH/pub_wallets.csv')
+        self.tx_hash_url = Arbitrum.tx_hash_explorers.get('arb') 
 
 
     def download_arb_transactions(self):
@@ -235,7 +239,7 @@ class Arbitrum(Blockchain):
                 mining_deposit_object = csv.reader(transactions_csv)
                 header_list = next(mining_deposit_object)
                 header_index = {header: header_list.index(header) for header in header_list}
-                mining_header_list = ['mining_pool_address', 'datetime', 'historcal_price', 'eth_deposited', 'value_deposited', 'transaction_fee', 'cost_basis']
+                mining_header_list = ['mining_pool_address', 'datetime', 'historical_price', 'eth_deposited', 'value_deposited', 'transaction_fee', 'cost_basis']
                 mining_income = []
 
                 for row in mining_deposit_object:
@@ -258,6 +262,34 @@ class Arbitrum(Blockchain):
         return f'Mining income reports created in {Arbitrum.mining_income_filepath}!'
 
 
+    def add_mining_income_to_cost_basis(self):
+        filepath_list = [item for item in pathlib.Path(self.mining_income_filepath).iterdir() if item.is_file()]
+
+        for file in filepath_list:
+            with open(file, 'r') as mining_income:
+                mining_income_object = csv.reader(mining_income)
+                mining_income_header = next(mining_income_object)
+                header_index = {header: mining_income_header.index(header) for header in mining_income_header}
+                mining_income_cost_basis = [[row[header_index.get('datetime')], row[header_index.get('historical_price')], row[header_index.get('eth_deposited')], row[header_index.get('cost_basis')]] for row in mining_income_object]
+
+            with open(self.cost_basis_filepath, 'r') as cost_basis:
+                cost_basis_object = csv.reader(cost_basis)
+                cost_basis_header = next(cost_basis_object)
+                current_cost_basis = [row for row in cost_basis_object] + mining_income_cost_basis
+                current_cost_basis.sort(key = lambda row: dt.strptime(row[cost_basis_header.index('datetime')], '%Y-%m-%d %H:%M:%S'))
+
+            with open(self.cost_basis_filepath, 'w') as cost_basis:
+                cost_basis_object = csv.writer(cost_basis)
+                cost_basis_object.writerow(cost_basis_header)
+                cost_basis_object.writerows(current_cost_basis)
+
+            return f'Mining Income cost basis added to {self.cost_basis_filepath}'
+
+
+
+
+
 arb = Arbitrum()
 #print(arb.download_arb_transactions())
-print(arb.create_mining_income_reports())
+#print(arb.create_mining_income_reports())
+print(arb.add_mining_income_to_cost_basis())

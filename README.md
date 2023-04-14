@@ -63,7 +63,10 @@ This is just an overview discription and each item listed here will be further d
 
 	- Added Arbitrum class to blockchain.py
 	- Arbitrum class will download transaction reports for Arbitrum transactions.
-	- Arbitrum class will read Arbiscan transaction reports, find mining deposits, and create a mining income csv file.
+	- Arbitrum class will read Arbiscan transaction reports, find mining deposits from mining pool 0xAddresses, and create a mining income csv file.
+
+6. v.0.37
+	- Arbitrum class will now add Arbitrum Eth cost basis from Arbitrum Eth mining deposits with add_mining_income_to_cost_basis() method. 
 
 	
 
