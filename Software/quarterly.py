@@ -1,8 +1,4 @@
 import csv
-import requests
-import os
-import numpy as np
-from selenium import webdriver
 
 def dict_reader(csv_file):
     return_dict = {}
@@ -85,12 +81,5 @@ class QuarterlyTaxes():
         return f'{quarterly_form_filepath} has been created!'
         
 
-    
-
-        
-
-
-    
-        
-
-
+#q2 = QuarterlyTaxes(2023)
+#print(q2.fill_out_quarterly_form(2))

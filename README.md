@@ -13,7 +13,7 @@
 
 
 ## Mission
-This program is designed to gather transaction data from Blockchain explorers and label that data for tax preparation. 
+This program is designed to gather transaction data from Blockchain explorers and label that data for uses such as tax preparation. 
 
 
 ## How to use
@@ -68,9 +68,16 @@ This is just an overview discription and each item listed here will be further d
 6. v.0.37
 	- Arbitrum class will now add Arbitrum Eth cost basis from Arbitrum Eth mining deposits with add_mining_income_to_cost_basis() method. 
 
+7. v.038
+    - Arbitrum class scraper now rewritten for better readability and maintainability. 
+    - Blockchain now broken up into separate class files.
+    - venv destroyed and rebuilt so requirements are fixed and up to date.
+    - Code housekeeping touches such as removing unused imports etc.
+
 	
 
 ## Upcoming features
+- pytest tests are coming for thorough tests and code documentation.
 - Download transactions csv files from blockchain explorers.
 - Labeling transactions in blockchain transaction csv files.
 - Proper text based UX which runs in the command line!
