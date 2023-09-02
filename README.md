@@ -74,6 +74,9 @@ This is just an overview discription and each item listed here will be further d
     - venv destroyed and rebuilt so requirements are fixed and up to date.
     - Code housekeeping touches such as removing unused imports etc.
 
+8. v.039
+    - Added test_api_data.py file which tests return historic price function
+    - More imports removed.  
 	
 
 ## Upcoming features

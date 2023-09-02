@@ -4,8 +4,6 @@ import requests
 import pathlib
 
 from common_functions import dictionary_from_csv
-from api_data import CoinGecko
-
 
 class Blockchain():
     other_information_filepath = '../CSV/OtherInformation/'
@@ -71,14 +69,6 @@ class Blockchain():
             for data_row in tax_data:
                 tax_form_object.writerow(data_row)
         return f'New 8949c tax form written in {filepath_destination}!'        
-
-
-
-
-
-
-
-
        
 
 
