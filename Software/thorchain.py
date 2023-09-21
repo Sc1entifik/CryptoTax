@@ -17,7 +17,7 @@ class ThorChain(Blockchain):
         #fees column needs to be split differently because of an annoying semicoln which is not always present but very annoying
         fees_column_splitter = lambda indexed_row: indexed_row.split() if len(indexed_row.split()) != 4 else f'{indexed_row[:indexed_row.find(";")]}{indexed_row[indexed_row.find(";") + 1:]}'.split()
         currency_ticker = lambda string: string[string.find('.') + 1: string.find('-')] if string.find('-') != -1 else string[string.find('.') + 1:]
-        fee_discovery_price = lambda ticker: '' if ticker == '' else (tx_discovery_price if ticker == tx_ticker else CoinGecko(ticker, dt.strptime(time.split()[0], '%d/%m/%Y')).return_historical_price())
+        fee_discovery_price = lambda ticker: '' if ticker == '' else (tx_discovery_price if ticker == tx_ticker else CoinGecko(ticker, dt.strptime(time, '%d/%m/%Y %H:%M:%S')).return_historic_price())
         data_row_list = []
         
         for row in data_object:
@@ -27,7 +27,7 @@ class ThorChain(Blockchain):
             direction = row[header_index.get('direction')]
             tx_volume = float(value_column_splitter(row, 'value', 0))
             tx_ticker = currency_ticker(value_column_splitter(row, 'value', 1))
-            tx_discovery_price = CoinGecko(tx_ticker, dt.strptime(time.split()[0], '%d/%m/%Y')).return_historical_price()
+            tx_discovery_price = CoinGecko(tx_ticker, dt.strptime(time, '%d/%m/%Y %H:%M:%S')).return_historic_price()
             tx_value = tx_volume * tx_discovery_price
             from_address = row[header_index.get('from')]
             to_address = row[header_index.get('to')]
@@ -59,7 +59,7 @@ class ThorChain(Blockchain):
             thor_transactions_object = csv.reader(transactions)
             data_row_list = self._datarows_list_from_tx_object(thor_transactions_object)
         
-        new_header_list = ['tx_hash', 'timestamp', 'time', 'direction', 'tx_type','tx_volume', 'tx_ticker', 'coin_gecko_tx_discovery_price', 'tx_value_in_USD', 'from_address', 'to_address', 'fee_1_volume', 'fee_1_ticker', 'coin_gecko_fee_1_discovery_price', 'fee_1_value_in_USD', 'fee_2_volume', 'fee_2_ticker', 'coin_gecko_fee_2_discovery_price', 'fee_2_value_in_USD']
+        new_header_list = ['tx_hash', 'timestamp', 'time', 'direction', 'tx_type', 'tx_volume', 'tx_ticker', 'coin_gecko_tx_discovery_price', 'tx_value_in_USD', 'from_address', 'to_address', 'fee_1_volume', 'fee_1_ticker', 'coin_gecko_fee_1_discovery_price', 'fee_1_value_in_USD', 'fee_2_volume', 'fee_2_ticker', 'coin_gecko_fee_2_discovery_price', 'fee_2_value_in_USD']
 
         with open(self.thor_transactions_filepath, 'w') as formatted_transactions:
             tx_data_object = csv.writer(formatted_transactions)

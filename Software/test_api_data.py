@@ -1,8 +1,13 @@
 import pytest
 from datetime import datetime as dt
+from time import sleep
 
 from api_data import CoinGecko
+from common_functions import dictionary_from_csv
 
+"""
+Run these tests with the -s flag due needing to interact with the coin choice menu when more than one coin gets returned from the coin_gecko_ticker_to_id.json file. The correct choice for the test is almost always the common sense choice. If you choose the wrong coin the test will fail and you will have to start over. If you are having trouble open up this file in your code editor and search for the terms in the to_49_names list. If the name is found that is the one you should choose from the menu.
+"""
 #A hard coded dictionary with the test_dates as keys, that returns a dictionary with the ticker symbols as keys, which returns a tuple of the expected price and the time in military hours the price in %H:%M:%S format from the coin gecko website.
 @pytest.fixture
 def date_ticker_price_time():
@@ -27,7 +32,23 @@ def test_historic_price(date_ticker_price_time):
             
             assert five_percent_tolerance(historic_price, expected_price) == True
     
+#If API rate limit is reached you may get an empty coin_gecko_ticker_to_id.csv file due to the coin gecko api locking you out. If this is the case simply wait a 
+def test_write_coin_gecko_json():
+    cg_test_object = CoinGecko("BNB", dt.strptime("14-07-2018 00:31:19", "%d-%m-%Y %H:%M:%S"))
+    cg_test_object.write_coin_gecko_json()
+    top_49_tickers = ("BTC","ETH","USDT","BNB","XRP","USDC","STETH","ADA","DOGE","SOL","TRX","TON","DOT","MATIC","LTC","SHIB","DAI","BCH","LEO","AVAX","TUSD","UNI","LINK","XLM","BUSD","XMR","OKB","ETC","ATOM","HBAR","MNT","QNT","ICP","FIL","LDO","CRO","APT","ARB","VET","NEAR","OP","MKR","XDC","FRAX","AAVE","GRT","WBT","ALGO","KAS")
+    top_49_names = ("bitcoin","ethereum","tether","binancecoin","ripple","usd-coin","staked-ether","cardano","dogecoin","solana","tron","the-open-network","polkadot","matic-network","litecoin","shiba-inu","dai","bitcoin-cash","leo-token","avalanche-2","true-usd","uniswap","chainlink","stellar","binance-usd","monero","okb","ethereum-classic","cosmos","hedera-hashgraph","mantle","quant-network","internet-computer","filecoin","lido-dao","crypto-com-chain","aptos","arbitrum","vechain","near","optimism","maker","xdce-crowd-sale","frax","aave","the-graph","whitebit","algorand","kaspa") 
 
-    
-    
-    
+    try:
+        for ticker, name in zip(top_49_tickers, top_49_names):
+            cg_test_object = CoinGecko(ticker, dt.strptime("14-07-2018 00:31:19", "%d-%m-%Y %H:%M:%S"))
+            id_from_ticker = cg_test_object._get_coin_id_from_ticker()
+            print(f"\nticker: {ticker}\nname: {name}\n")
+            assert id_from_ticker == name
+
+    except AttributeError:
+        print("You have likely reached the Coin Gecko API limit. We bill try recalling the function again in a little over a minute. If this message has repeated more than two times please STOP with ctrl-c so you don't get locked out from using the Coin Gecko API. In that case give it 5-10 more minutes before trying again.")
+        sleep(72)
+
+        return test_write_coin_gecko_json()
+

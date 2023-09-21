@@ -77,6 +77,10 @@ This is just an overview discription and each item listed here will be further d
 8. v.039
     - Added test_api_data.py file which tests return historic price function
     - More imports removed.  
+
+9. v.0.41
+    - Refactored api_data.py file and rewrote test_api_data.py file to reflect new changes.
+    - New CoinGecko class will now let you choose between multiple coins found when the json file finds multiple coins with the same symbol.
 	
 
 ## Upcoming features

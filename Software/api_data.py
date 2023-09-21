@@ -1,74 +1,88 @@
 import requests
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 import json
-import csv
 from datetime import datetime
 from time import sleep
 
-from common_functions import dictionary_from_csv
-
 class CoinGecko():
-    coin_gecko_ticker_id_filepath = '../CSV/API/coin_gecko_ticker_to_id.csv'
-    requests_url = 'https://api.coingecko.com/api/v3/coins/'
-    coin_list_endpoint = 'list?include_platform=false'
+    coin_gecko_ticker_id_filepath = "../CSV/API/coin_gecko_ticker_to_id.json"
+    requests_url = "https://api.coingecko.com/api/v3/coins/"
+    coin_list_endpoint = "list?include_platform=false"
+    unwanted_search_terms = ("-wormhole", "-binance-", "-peg-", "-pulsechain", "pulsecchain-", "bridged-", "-bridge", "wrapped-")
 
     def __init__(self, ticker_symbol, historic_dt):
         self.ticker = ticker_symbol.lower()
         self.query_date = historic_dt.strftime('%d-%m-%Y %H:%M:%S')
-        #needed to keep writing unwanted ticker, id dictionary pairs to coin_gecko_ticker_to_id.csv
-        self.unwanted_coin_gecko_ids = ['ethereum-wormhole', 'thorchain-erc20', 'oec-binance-coin', 'heco-peg-bnb', 'binance-coin-wormhole']
+
+
+    def _load_coin_gecko_json(self):
+        with open(CoinGecko.coin_gecko_ticker_id_filepath) as coin_gecko_object:
+            cg_json = json.load(coin_gecko_object)
+
+        return cg_json
+
+
+    def _get_coin_id_from_ticker(self):
+        coin_gecko_json = self._load_coin_gecko_json()
+        found_coins = [coin for coin in coin_gecko_json if coin.get("symbol") == self.ticker and True not in map(lambda x: False if coin.get("id").find(x) == -1 else True, CoinGecko.unwanted_search_terms)]
+
+        if len(found_coins) == 1:
+            return found_coins[0].get("id")
+
+        elif len(found_coins) == 0:
+            return "Sorry your coin wasn't found in the Coin Gecko API. The filter was probably too strict."
+
+        else:
+            found_coin_dict = {str(i+1): found_coins[i] for i in range(len(found_coins))}
+            print("More than one coin found. Please choose the coin you traded from the following list\n")
+
+            for index, coin in found_coin_dict.items():
+                print(f"{index}) {coin}")
+
+            coin_choice = None
+            print()
+
+            while not coin_choice:
+                coin_choice = found_coin_dict.get(input("Please enter one of the coin numbers listed above\n"))
+
+            return coin_choice.get("id")
 
     
     #needed to convert ticker symbols to id parameters which Coin Gecko uses to pull data
-    def write_ticker_to_id_csv(self):
+    def write_coin_gecko_json(self):
 
-        with requests.Session() as coin_list:
-            coin_list_object = coin_list.get(f'{CoinGecko.requests_url}{CoinGecko.coin_list_endpoint}')
-            coin_list_object.content.decode('utf-8')
-            coin_list_json = coin_list_object.json()
+        with requests.Session() as requests_object:
+            coin_json = json.loads(requests_object.get(f"{CoinGecko.requests_url}{CoinGecko.coin_list_endpoint}").content.decode("utf-8"))
 
-        with open(CoinGecko.coin_gecko_ticker_id_filepath, 'w') as ticker_to_id:
-            csv_object = csv.writer(ticker_to_id)
-            header = ['key','value']
-            csv_object.writerow(header)
+        with open(CoinGecko.coin_gecko_ticker_id_filepath, "w") as json_file:
+            json.dump(coin_json, json_file)
 
-            for coin in coin_list_json:
-                if coin.get('id') not in self.unwanted_coin_gecko_ids:
-                    csv_object.writerow([coin.get('symbol'), coin.get('id')])
-
-        return f'Ticker to ID conversion file written to {CoinGecko.coin_gecko_ticker_id_filepath}!'
+        return f"API file has been written to {CoinGecko.coin_gecko_ticker_id_filepath}!"
 
 
     def return_historic_price(self):
-        ticker_to_id = dictionary_from_csv(CoinGecko.coin_gecko_ticker_id_filepath)
-        price_query_url = f'{CoinGecko.requests_url}{ticker_to_id.get(self.ticker)}/history?date={self.query_date}&localization=false'
+        price_query_url = f"{CoinGecko.requests_url}{self._get_coin_id_from_ticker()}/history?date={self.query_date}&localization=false"
 
-        with requests.Session() as historic_price:
+        with requests.Session() as requests_object:
             try:
-                historic_price_object = historic_price.get(price_query_url)
-                historic_price_object.content.decode('utf-8')
-                historic_price_json = historic_price_object.json()
+                historic_price_json = json.loads(requests_object.get(price_query_url).content.decode("utf-8"))
 
             except ConnectionError:
-                print('Your historic price query failed due to a Connection Error. We will try to call the function again in one minute. If this creates an endless loop break with ctrl-c')
+                print("Your historic price query failed due to a Connection Error. We will try to call the function again in one minute. If this creates an endless loop break with ctrl-c")
                 sleep(62)
                 return self.return_historic_price()
 
             except TimeoutError:
-                print('A timeout error occured.')
+                print("A timeout error occured.")
 
             except TooManyRedirects:
-                print('Your query failed do to too many redirects.')
+                print("Your query failed do to too many redirects.")
 
         try:
-            return historic_price_json.get('market_data').get('current_price').get('usd')
+            return historic_price_json.get("market_data").get("current_price").get("usd")
 
         except AttributeError:
-            print(f'Your query failed because historic_price_json is a NoneType object\n\nticker: {self.ticker}\nlookup_date: {self.query_date}\nticker_id: {ticker_to_id.get(self.ticker)}')
-            print('\n\nThis attribute error may have occured do to reaching API limits. We will try to call the function again in one minute. Give this loop at least two iterations before giving up by pressing ctrl-c. \n\nIf the same loop values have been stuck for more than two iterations you can add the ticker_id value shown above to self.unwanted_coin_gecko_ids in the __init__() function of the CoinGecko class of the api_data.py file in the Software folder.\n')
+            print(f"Your query failed because historic_price_json is a NoneType object\n\nticker: {self.ticker}\nlookup_date: {self.query_date}\nticker_id: {self._get_coin_id_from_ticker()}")
+            print("\n\nThis attribute error likely occured do to reaching API limits. We will try to call the function again in one minute. Give this loop at least two iterations before giving up by pressing ctrl-c. \n\nIf the same loop values have been stuck for more than two iterations check to make sure your internet connection is intact. Assuming your internet connection is good it is possible that Coin Gecko doesn't have the historic data either for that coin or for that coin for that date. Go to Coin Gecko.com and look up the coin you are looking for and see if the date goes back as far as the date you are trying to look up.\n")
             sleep(72)
             return self.return_historic_price()
-
-cg = CoinGecko('BNB', datetime.strptime('11/11/2022 03:00:22','%d/%m/%Y %H:%M:%S'))
-print(cg.return_historic_price())
-#print(cg.write_ticker_to_id_csv())
