@@ -5,7 +5,7 @@ from datetime import datetime
 from time import sleep
 
 class CoinGecko():
-    coin_gecko_ticker_id_filepath = "../CSV/API/coin_gecko_ticker_to_id.json"
+    coin_gecko_ticker_id_filepath = "Dict_CSV/API/coin_gecko_ticker_to_id.json"
     requests_url = "https://api.coingecko.com/api/v3/coins/"
     coin_list_endpoint = "list?include_platform=false"
     unwanted_search_terms = ("-wormhole", "-binance-", "-peg-", "-pulsechain", "pulsecchain-", "bridged-", "-bridge", "wrapped-")

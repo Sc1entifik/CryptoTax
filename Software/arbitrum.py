@@ -2,17 +2,19 @@ from datetime import datetime as dt
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
-from blockchain import *
+from blockchain import Blockchain
 
 class Arbitrum(Blockchain):
+    arbiscan_url = "https://arbiscan.io/exportData?type=address&a="
+    tx_hash_url = "https://arbiscan.io/tx/"
+    transactions_filepath = f"{Blockchain.blockchain_transactions_filepath}ARB/"
+    mining_filepath = f"{Blockchain.mining_income_filepath}ARB/"
+    cost_basis_csv_filepath = f"{Blockchain.cost_basis_filepath}ETH/ARB/cost_basis.csv"
+
 
     def __init__(self):
         super().__init__()
-        self.arb_transactions_filepath = f'{Arbitrum.blockchain_transactions_filepath}ARB/'
-        self.mining_income_filepath = f'{Arbitrum.mining_income_filepath}ARB/'
-        self.cost_basis_filepath = f'{Arbitrum.cost_basis_filepath}ETH/ARB/cost_basis.csv'
         self.wallet_address_dictionary = dictionary_from_csv(f'{Arbitrum.pub_wallets_filepath}ETH/pub_wallets.csv')
-        self.tx_hash_url = Arbitrum.tx_hash_explorers.get('arb') 
         
 
     def _transaction_data_from_selenium_scraper(scraped_data):
@@ -39,7 +41,7 @@ class Arbitrum(Blockchain):
         fire_fox_options = webdriver.FirefoxOptions()
         fire_fox_options.add_argument("--headless")
         driver = webdriver.Firefox(options = fire_fox_options)
-        driver.get(f'{self.tx_hash_url}{tx_hash}')
+        driver.get(f'{Arbitrum.tx_hash_url}{tx_hash}')
         transactions = [element.text for element in driver.find_elements(By.TAG_NAME, 'ul') if element.text.find('From Null:') != -1][0].split('\n')
         search_term_index_buffer = 3
         elements = [element[element.find('For') + search_term_index_buffer:] for element in transactions if element.find('From Null') == -1]
@@ -51,15 +53,15 @@ class Arbitrum(Blockchain):
     def download_arb_transactions(self):
         
         for wallet in self.wallet_address_dictionary.values():
-            download_url = f'{Arbitrum.explorer_dictionary.get("arb")}{wallet}'
-            self.dl_tx_report_link(download_url, self.arb_transactions_filepath)
-            print(f'Your default webbrowser has been loaded to {download_url}. Complete the robot tests there and then save your transactions file to {self.arb_transactions_filepath}arb{wallet}.csv.\n\n')
+            download_url = f'{Arbitrum.arbiscan_url}{wallet}'
+            self.dl_tx_report_link(download_url, Arbitrum.transactions_filepath)
+            print(f'Your default webbrowser has been loaded to {download_url}. Complete the robot tests there and then save your transactions file to {Arbitrum.transactions_filepath}arb{wallet}.csv.\n\n')
         
         return 'Make sure to follow the above directions for all your Arbitrum chain wallet addresses.' 
 
 
     def create_mining_income_reports(self):
-        filepath_list = [item for item in pathlib.Path(self.arb_transactions_filepath).iterdir() if item.is_file()]
+        filepath_list = [item for item in pathlib.Path(Arbitrum.transactions_filepath).iterdir() if item.is_file()]
         
         for file in filepath_list:
             with open(file, 'r') as transactions_csv:
@@ -99,18 +101,18 @@ class Arbitrum(Blockchain):
                 header_index = {header: mining_income_header.index(header) for header in mining_income_header}
                 mining_income_cost_basis = [[row[header_index.get('datetime')], row[header_index.get('historical_price')], row[header_index.get('eth_deposited')], row[header_index.get('cost_basis')]] for row in mining_income_object]
 
-            with open(self.cost_basis_filepath, 'r') as cost_basis:
+            with open(Arbitrum.cost_basis_csv_filepath, 'r') as cost_basis:
                 cost_basis_object = csv.reader(cost_basis)
                 cost_basis_header = next(cost_basis_object)
                 current_cost_basis = [row for row in cost_basis_object] + mining_income_cost_basis
                 current_cost_basis.sort(key = lambda row: dt.strptime(row[cost_basis_header.index('datetime')], '%Y-%m-%d %H:%M:%S'))
 
-            with open(self.cost_basis_filepath, 'w') as cost_basis:
+            with open(Arbitrum.cost_basis_csv_filepath, 'w') as cost_basis:
                 cost_basis_object = csv.writer(cost_basis)
                 cost_basis_object.writerow(cost_basis_header)
                 cost_basis_object.writerows(current_cost_basis)
 
-            return f'Mining Income cost basis added to {self.cost_basis_filepath}'
+            return f'Mining Income cost basis added to {Arbitrum.cost_basis_csv_filepath}'
 
 
     
@@ -118,4 +120,4 @@ arb = Arbitrum()
 #print(arb.download_arb_transactions())
 #print(arb.create_mining_income_reports())
 #print(arb.tx_hash_url)
-print(arb.selenium_tx_scraper('0x4c09ebd1f737b73f769a529f89e80144635d1993bc83352854609e488e92f41d'))
+#print(arb.selenium_tx_scraper('0x4c09ebd1f737b73f769a529f89e80144635d1993bc83352854609e488e92f41d'))

@@ -1,5 +1,8 @@
-CSV/
+Software/Dict_CSV/
+Software/Tax/
+Software/Archive/
+Software/scratch_pad.py
+Software/scratch_pad_2.py
+Software/ScratchTest/
 venv/
 UsefulInfo/
-Software/scratch_pad.py
-current_plan.txt

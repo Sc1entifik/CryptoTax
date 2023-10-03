@@ -81,13 +81,18 @@ This is just an overview discription and each item listed here will be further d
 9. v.0.41
     - Refactored api_data.py file and rewrote test_api_data.py file to reflect new changes.
     - New CoinGecko class will now let you choose between multiple coins found when the json file finds multiple coins with the same symbol.
+
+10. v.0.48
+    - Created archive.py and archive_test.py 
+    - Tax file archival has arrived!
+    - Changed file structure for better archival and organization.
+    - If this version is not working for you downgrade to a lower version for the time being. Due to the changing of the file structure some references may now be broken. 
+    - The file new file structure will be addressed in the next release as will new, and hopefully more simple instructions be written. 
 	
 
 ## Upcoming features
 - pytest tests are coming for thorough tests and code documentation.
-- Download transactions csv files from blockchain explorers.
-- Labeling transactions in blockchain transaction csv files.
-- Proper text based UX which runs in the command line!
+- bash files to be retired with an upcoming directory and file creation class.
+- Proper gui UX!
 - More automated tax forms coming!
 - More blockchains to be supported!
-- Tax record archive process!
