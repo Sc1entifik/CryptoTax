@@ -88,6 +88,9 @@ This is just an overview discription and each item listed here will be further d
     - Changed file structure for better archival and organization.
     - If this version is not working for you downgrade to a lower version for the time being. Due to the changing of the file structure some references may now be broken. 
     - The file new file structure will be addressed in the next release as will new, and hopefully more simple instructions be written. 
+
+11. v.0.52
+    - Refactored quarterly.py to separate tax and writeoff liabilites for each business entered.
 	
 
 ## Upcoming features

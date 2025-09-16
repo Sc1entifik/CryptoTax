@@ -37,7 +37,7 @@ class QuarterlyTaxes():
 
         return f'{full_file_path} has been created!'
 
-
+    '''
     def _return_csv_column_as_list(self, file_path, key):
         column_list = []
 
@@ -47,7 +47,53 @@ class QuarterlyTaxes():
                 column_list.append(row.get(key))
 
         return column_list
+    '''
+
+
+    def _unique_business_names_set(self, income_dictionaries):
+        unique_business_names = set()
+
+        for income_dictionary in income_dictionaries:
+            unique_business_names.add(income_dictionary.get("business_name"))
+
+        return unique_business_names
+
+
+    def _income_and_deductions_dictionaries(self, quarter):
+        income_csv_path = f'{QuarterlyTaxes.schedule_c_income_filepath}/schedule_c_q{quarter}_income.csv'
+        deductions_csv_path = f'{QuarterlyTaxes.schedule_c_writeoffs_file_path}/schedule_c_q{quarter}_writeoffs.csv'
+
+        with open(income_csv_path, 'r') as income_table:
+            income_iterator = csv.DictReader(income_table)
+            income_dictionaries = list(income_iterator)
+
+        with open(deductions_csv_path, 'r') as deductions_table:
+            deductions_iterator = csv.DictReader(deductions_table)
+            deductions_dictionaries = list(deductions_iterator)
+
+
+        return income_dictionaries, deductions_dictionaries
+
+
+
+
+    def _tax_estimates_list(self, quarter):
+        income_dictionaries, deduction_dictionaries = self._income_and_deductions_dictionaries(quarter)
+        business_names = self._unique_business_names_set(income_dictionaries)
+        due_date = self.due_date_dict.get(quarter)
+        tax_estimates = []
+        
+        for business in business_names:
+            business_income = sum(int(income_object.get("income")) for income_object in income_dictionaries if income_object.get("business_name") == business)
+            business_writeoff = sum(int(deduction_object.get("write_off_amount")) for deduction_object in deduction_dictionaries if deduction_object.get("business_name") == business)
+            taxable_income = business_income - business_writeoff if business_income - business_writeoff > 0 else 0
+            federal_payment = round(taxable_income * QuarterlyTaxes.federal_percentage, 2) 
+            state_payment = round(taxable_income * QuarterlyTaxes.state_percentage, 2) 
+            local_payment = round(taxable_income * QuarterlyTaxes.local_percentage, 2) 
+            tax_estimates.append([due_date, business, business_income, business_writeoff, federal_payment, state_payment, local_payment])
     
+        return tax_estimates
+
 
     def generate_quarterly_schedule_c_forms(self):
         schedule_c_form_types = ['income', 'writeoff']
@@ -55,7 +101,7 @@ class QuarterlyTaxes():
         for form_type in schedule_c_form_types:
             for quarter in self.due_date_dict:
                 file_path = f'{QuarterlyTaxes.schedule_c_income_filepath}/schedule_c_q{quarter}_income.csv' if form_type == 'income' else f'{QuarterlyTaxes.schedule_c_writeoffs_file_path}/schedule_c_q{quarter}_writeoffs.csv'
-                header = ['date', 'income'] if form_type == 'income' else ['date', 'write_off_description', 'write_off_amount']
+                header = ['date', 'business_name', 'income'] if form_type == 'income' else ['date', 'business_name', 'write_off_description', 'write_off_amount']
                 first_row = [self.due_date_dict.get(quarter), None] if form_type == 'income' else [self.due_date_dict.get(quarter), None, None]
 
                 print(self._quarterly_csv_form_generator(file_path, header, first_row))
@@ -64,22 +110,21 @@ class QuarterlyTaxes():
 
 
     def fill_out_quarterly_form(self, quarter):
-        income_path = f'{QuarterlyTaxes.schedule_c_income_filepath}/schedule_c_q{quarter}_income.csv'
-        deductions_path = f'{QuarterlyTaxes.schedule_c_writeoffs_file_path}/schedule_c_q{quarter}_writeoffs.csv'
         quarterly_form_filepath = f'{QuarterlyTaxes.scedule_c_quarterly_payments_file_path}/schedule_c_q{quarter}_payment.csv'
-        total_income = round(sum(map(float, self._return_csv_column_as_list(income_path, 'income'))), 2)
-        total_deductions = round(sum(map(float, self._return_csv_column_as_list(deductions_path, 'write_off_amount'))), 2)
         
         with open(quarterly_form_filepath, 'w') as quarterly_form:
             writer = csv.writer(quarterly_form)
-            header = ('date_sent', 'income', 'deductions', 'federal_tax', 'state_tax', 'local_tax')
-            payment = lambda x: round((total_income - total_deductions) * x, 2)
-            row = [self.due_date_dict.get(quarter), total_income, total_deductions, payment(QuarterlyTaxes.federal_percentage), payment(QuarterlyTaxes.state_percentage), payment(QuarterlyTaxes.local_percentage)]
+            header = ('date_sent', 'business_name', 'income', 'deductions', 'federal_tax', 'state_tax', 'local_tax')
+            tax_estimates = self._tax_estimates_list(quarter) 
             writer.writerow(header)
-            writer.writerow(row)
+            writer.writerows(tax_estimates)
 
         return f'{quarterly_form_filepath} has been created!'
         
 
-#q2 = QuarterlyTaxes(2023)
-#print(q2.fill_out_quarterly_form(2))
+quarter_forms = QuarterlyTaxes(2025)
+#print(quarter_forms.generate_quarterly_schedule_c_forms())
+#print(quarter_forms.fill_out_quarterly_form(1))
+#print(quarter_forms.fill_out_quarterly_form(2))
+#print(quarter_forms.fill_out_quarterly_form(3))
+#print(quarter_forms.fill_out_quarterly_form(4))
