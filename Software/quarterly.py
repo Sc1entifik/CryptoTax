@@ -1,8 +1,8 @@
 import csv
 
-def dict_reader(csv_file):
+def dict_reader(csv_file_path):
     return_dict = {}
-    with open(csv_file, 'r', newline='') as csv_dict:
+    with open(csv_file_path, 'r', newline='') as csv_dict:
         dict_object = csv.DictReader(csv_dict)
         
         for key_value_pair in dict_object:
@@ -21,6 +21,7 @@ class QuarterlyTaxes():
     federal_percentage = float(tax_percentages_dict.get('federal'))
     state_percentage = float(tax_percentages_dict.get('state'))
     local_percentage = float(tax_percentages_dict.get('local'))
+    mileage_writeoff_rate = .7
 
 
     #tax year in yyyy format
@@ -37,18 +38,6 @@ class QuarterlyTaxes():
 
         return f'{full_file_path} has been created!'
 
-    '''
-    def _return_csv_column_as_list(self, file_path, key):
-        column_list = []
-
-        with open(file_path, 'r') as csv_table:
-            csv_dict = csv.DictReader(csv_table)
-            for row in csv_dict:
-                column_list.append(row.get(key))
-
-        return column_list
-    '''
-
 
     def _unique_business_names_set(self, income_dictionaries):
         unique_business_names = set()
@@ -59,9 +48,29 @@ class QuarterlyTaxes():
         return unique_business_names
 
 
+    def _convert_mileage_to_deduction(self, quarter):
+        deductions_csv_path = f'{QuarterlyTaxes.schedule_c_writeoffs_file_path}/schedule_c_q{quarter}_writeoffs.csv'
+
+        with open(deductions_csv_path, 'r') as deductions_table:
+            deductions_iterator = csv.DictReader(deductions_table)
+            deductions_dictionaries = list(deductions_iterator)
+            fieldnames = deductions_iterator.fieldnames
+
+        for deduction_object in deductions_dictionaries:
+            if deduction_object.get("write_off_description") == "mileage":
+                write_off_amount = float(deduction_object.get("write_off_amount"))
+                deduction_object["write_off_amount"] = round(QuarterlyTaxes.mileage_writeoff_rate * write_off_amount) 
+
+        with open(deductions_csv_path, 'w') as deductions_table:
+            writer = csv.DictWriter(deductions_table, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(deductions_dictionaries)
+
+
     def _income_and_deductions_dictionaries(self, quarter):
         income_csv_path = f'{QuarterlyTaxes.schedule_c_income_filepath}/schedule_c_q{quarter}_income.csv'
         deductions_csv_path = f'{QuarterlyTaxes.schedule_c_writeoffs_file_path}/schedule_c_q{quarter}_writeoffs.csv'
+        self._convert_mileage_to_deduction(quarter)
 
         with open(income_csv_path, 'r') as income_table:
             income_iterator = csv.DictReader(income_table)
@@ -73,8 +82,6 @@ class QuarterlyTaxes():
 
 
         return income_dictionaries, deductions_dictionaries
-
-
 
 
     def _tax_estimates_list(self, quarter):
@@ -126,5 +133,5 @@ quarter_forms = QuarterlyTaxes(2025)
 #print(quarter_forms.generate_quarterly_schedule_c_forms())
 #print(quarter_forms.fill_out_quarterly_form(1))
 #print(quarter_forms.fill_out_quarterly_form(2))
-#print(quarter_forms.fill_out_quarterly_form(3))
+print(quarter_forms.fill_out_quarterly_form(3))
 #print(quarter_forms.fill_out_quarterly_form(4))
